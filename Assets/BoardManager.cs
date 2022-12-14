@@ -5,16 +5,9 @@ using UnityEngine;
 
 public enum GameResults
 {
+    DRAW,
     PLAYER1WIN,
     PLAYER2WIN,
-    DRAW
-}
-
-public enum TokensType
-{
-    EMPTY,
-    PLAYER1,
-    PLAYER2,
 }
 
 public static class BoardManager
@@ -34,9 +27,9 @@ public static class BoardManager
     }
 
 
-    static TokensType[,] _gameBoard;
+    static int?[,] _gameBoard; // At first i thought to use enum. but this is more open to extensions
 
-    static event Action<GameResults> gameResultEvent;
+    public static event Action<GameResults> gameResultEvent;
 
     static int _tokensPlaced;
     static int _rows;
@@ -46,44 +39,44 @@ public static class BoardManager
     {
         _rows = rows;
         _cols = cols;
-        _gameBoard = new TokensType[rows,cols];
+        _gameBoard = new int?[rows,cols];
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; i < cols; i++)
             {
-                _gameBoard[i, j] = TokensType.EMPTY;
+                _gameBoard[i, j] = null;
             }
         }
         _tokensPlaced = 0;
     }
 
-    static TokensType GetToken(int row, int col)
+    public static int? GetToken(int row, int col)
     {
         return _gameBoard[row, col];
     }
 
-    static TokensType GetToken(TokenPlace place)
+    static int? GetToken(TokenPlace place)
     {
         return GetToken(place.row, place.col);
     }
 
-    static void SetToken(int row, int col, TokensType type)
+    static void SetToken(int row, int col, int playerID)
     {
-        if(_gameBoard[row, col] != TokensType.EMPTY)
+        if(_gameBoard[row, col] != null)
         {
             Debug.LogError("Not an empty space, can't put this token here");
         }
-        _gameBoard[row, col] = type;
+        _gameBoard[row, col] = playerID;
         CheckResult(new TokenPlace(row, col));
     }
 
-    public static bool PutToken(int col, TokensType type)
+    public static bool PutToken(int col, int playerID)
     {
         for (int i = _rows-1; i >= 0; i--)
         {
-            if(GetToken(i,col) == TokensType.EMPTY)
+            if(GetToken(i,col) == null)
             {
-                SetToken(i, col, type);
+                SetToken(i, col, playerID);
                 return true;
             }
         }
@@ -95,7 +88,7 @@ public static class BoardManager
 
     private static bool IsWinInRow(TokenPlace place)
     {
-        TokensType token = GetToken(place);
+        int? token = GetToken(place);
         int count = 1;
         for (int i = 1; i < TOKENS_TO_WIN && place.col+i < _cols; i++)
         {
@@ -122,9 +115,14 @@ public static class BoardManager
         return count >= TOKENS_TO_WIN;
     }
 
+    public static bool IsEmpty(int row, int col)
+    {
+        return _gameBoard[row,col] == null;
+    }
+
     private static bool IsWinInCol(TokenPlace place)
     {
-        TokensType token = GetToken(place);
+        int? token = GetToken(place);
         int count = 1;
         for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows; i++)
         {
@@ -153,7 +151,7 @@ public static class BoardManager
 
     private static bool IsWinLeftDiagonal(TokenPlace place)
     {
-        TokensType token = GetToken(place);
+        int? token = GetToken(place);
         int count = 1;
         for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows && place.col + i < _cols; i++)
         {
@@ -183,7 +181,7 @@ public static class BoardManager
 
     private static bool IsWinRightDiagonal(TokenPlace place)
     {
-        TokensType token = GetToken(place);
+        int? token = GetToken(place);
         int count = 1;
         for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows && place.col - i >= 0; i++)
         {
@@ -215,15 +213,7 @@ public static class BoardManager
     {
         if(IsWinInRow(lastTokenPlaced) || IsWinInCol(lastTokenPlaced) || IsWinLeftDiagonal(lastTokenPlaced) || IsWinRightDiagonal(lastTokenPlaced))
         {
-            if(GetToken(lastTokenPlaced) == TokensType.PLAYER1)
-            {
-                gameResultEvent.Invoke(GameResults.PLAYER1WIN);
-
-            }
-            else
-            {
-                gameResultEvent.Invoke(GameResults.PLAYER2WIN);
-            }
+            gameResultEvent.Invoke((GameResults) GetToken(lastTokenPlaced));
         }
         else
         {
@@ -233,6 +223,4 @@ public static class BoardManager
             }
         }
     }
-
-    
 }
