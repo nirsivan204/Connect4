@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     const int NUM_OF_ROWS = 7;
     const int NUM_OF_COLS = 6;
     const int NUM_OF_PLAYERS = 2;
+    const int NUM_OF_TOKENS_TO_CONNECT = 4;
 
     bool _isGameEnded = false;
     bool _isTurnOngoing = false;
@@ -45,7 +46,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         ValidateGame();
-        BoardManager.InitBoard(NUM_OF_ROWS, NUM_OF_COLS);
+        BoardManager.InitBoard(NUM_OF_ROWS, NUM_OF_COLS,NUM_OF_PLAYERS, NUM_OF_TOKENS_TO_CONNECT);
         _isGameEnded = false;
     }
 
@@ -84,7 +85,7 @@ public class GameManager : MonoBehaviour
         Disk diskPrefab = playersDisks[_turn];
         _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, 0);
         _lastDiskPlaced.StoppedFalling += OnDiskStoppedFalling;
-        BoardManager.PutToken(col, _turn);
+        BoardManager.PutToken(col, _turn+1);
     }
 
     private void OnDiskStoppedFalling()

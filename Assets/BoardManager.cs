@@ -12,7 +12,6 @@ public enum GameResults
 
 public static class BoardManager
 {
-    const int TOKENS_TO_WIN = 4;
 
     private struct TokenPlace
     {
@@ -27,60 +26,75 @@ public static class BoardManager
     }
 
 
-    static int?[,] _gameBoard; // At first i thought to use enum. but this is more open to extensions
+    static int[,] _gameBoard; // At first i thought to use enum as the type, because there are only 2 players but this is more open to extensions (3 or more players)
 
     public static event Action<GameResults> gameResultEvent;
 
     static int _tokensPlaced;
     static int _rows;
     static int _cols;
+    static int _numOfPlayers;
+    static int _tokensToConnect;
 
-    public static void InitBoard(int rows,int cols)
+    public static void InitBoard(int rows, int cols)
+    {
+        InitBoard(rows, cols, 2, 4);
+    }
+
+
+    public static void InitBoard(int rows, int cols, int numOfPlayers, int tokensToConnect)
     {
         _rows = rows;
         _cols = cols;
-        _gameBoard = new int?[rows,cols];
+        _numOfPlayers = numOfPlayers;
+        _tokensToConnect = tokensToConnect;
+        _gameBoard = new int[rows, cols];
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; i < cols; i++)
             {
-                _gameBoard[i, j] = null;
+                _gameBoard[i, j] = 0;
             }
         }
         _tokensPlaced = 0;
     }
 
-    public static int? GetToken(int row, int col)
+    public static int GetToken(int row, int col)
     {
         return _gameBoard[row, col];
     }
 
-    static int? GetToken(TokenPlace place)
+    static int GetToken(TokenPlace place)
     {
         return GetToken(place.row, place.col);
     }
 
     static void SetToken(int row, int col, int playerID)
     {
-        if(_gameBoard[row, col] != null)
+        if (_gameBoard[row, col] != 0)
         {
             Debug.LogError("Not an empty space, can't put this token here");
         }
         _gameBoard[row, col] = playerID;
-        CheckResult(new TokenPlace(row, col));
+        _tokensPlaced++;
+        CheckResult(new TokenPlace(row, col), playerID);
     }
 
-    public static bool PutToken(int col, int playerID)
+    public static void PutToken(int col, int playerID)
     {
+        if (playerID == 0 || playerID > _numOfPlayers)
+        {
+            throw new Exception("Tried putting illigal player token");
+        }
         for (int i = _rows-1; i >= 0; i--)
         {
-            if(GetToken(i,col) == null)
+            if(GetToken(i,col) == 0)
             {
                 SetToken(i, col, playerID);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new Exception("Tried putting player token in a full column");
     }
 
 
@@ -88,9 +102,9 @@ public static class BoardManager
 
     private static bool IsWinInRow(TokenPlace place)
     {
-        int? token = GetToken(place);
+        int token = GetToken(place);
         int count = 1;
-        for (int i = 1; i < TOKENS_TO_WIN && place.col+i < _cols; i++)
+        for (int i = 1; i < _tokensToConnect && place.col+i < _cols; i++)
         {
             if(GetToken(place.row, place.col+i) == token)
             {
@@ -101,7 +115,7 @@ public static class BoardManager
                 break;
             }
         }
-        for (int i = 1; i < TOKENS_TO_WIN && place.col - i >= 0; i++)
+        for (int i = 1; i < _tokensToConnect && place.col - i >= 0; i++)
         {
             if (GetToken(place.row, place.col - i) == token)
             {
@@ -112,19 +126,19 @@ public static class BoardManager
                 break;
             }
         }
-        return count >= TOKENS_TO_WIN;
+        return count >= _tokensToConnect;
     }
 
     public static bool IsEmpty(int row, int col)
     {
-        return _gameBoard[row,col] == null;
+        return _gameBoard[row,col] == 0;
     }
 
     private static bool IsWinInCol(TokenPlace place)
     {
-        int? token = GetToken(place);
+        int token = GetToken(place);
         int count = 1;
-        for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows; i++)
+        for (int i = 1; i < _tokensToConnect && place.row + i < _rows; i++)
         {
             if (GetToken(place.row + i, place.col) == token)
             {
@@ -135,7 +149,7 @@ public static class BoardManager
                 break;
             }
         }
-        for (int i = 1; i < TOKENS_TO_WIN && place.row - i >= 0; i++)
+        for (int i = 1; i < _tokensToConnect && place.row - i >= 0; i++)
         {
             if (GetToken(place.row - i, place.col) == token)
             {
@@ -146,14 +160,14 @@ public static class BoardManager
                 break;
             }
         }
-        return count >= TOKENS_TO_WIN;
+        return count >= _tokensToConnect;
     }
 
     private static bool IsWinLeftDiagonal(TokenPlace place)
     {
-        int? token = GetToken(place);
+        int token = GetToken(place);
         int count = 1;
-        for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows && place.col + i < _cols; i++)
+        for (int i = 1; i < _tokensToConnect && place.row + i < _rows && place.col + i < _cols; i++)
         {
             if (GetToken(place.row + i, place.col + i) == token)
             {
@@ -164,7 +178,7 @@ public static class BoardManager
                 break;
             }
         }
-        for (int i = 1; i < TOKENS_TO_WIN && place.col - i >= 0 && place.row - i >= 0; i++)
+        for (int i = 1; i < _tokensToConnect && place.col - i >= 0 && place.row - i >= 0; i++)
         {
             if (GetToken(place.row - i, place.col - i) == token)
             {
@@ -175,15 +189,15 @@ public static class BoardManager
                 break;
             }
         }
-        return count >= TOKENS_TO_WIN;
+        return count >= _tokensToConnect;
     }
 
 
     private static bool IsWinRightDiagonal(TokenPlace place)
     {
-        int? token = GetToken(place);
+        int token = GetToken(place);
         int count = 1;
-        for (int i = 1; i < TOKENS_TO_WIN && place.row + i < _rows && place.col - i >= 0; i++)
+        for (int i = 1; i < _tokensToConnect && place.row + i < _rows && place.col - i >= 0; i++)
         {
             if (GetToken(place.row + i, place.col - i) == token)
             {
@@ -194,7 +208,7 @@ public static class BoardManager
                 break;
             }
         }
-        for (int i = 1; i < TOKENS_TO_WIN && place.col + i < _cols && place.row - i >= 0; i++)
+        for (int i = 1; i < _tokensToConnect && place.col + i < _cols && place.row - i >= 0; i++)
         {
             if (GetToken(place.row - i, place.col + i) == token)
             {
@@ -205,21 +219,21 @@ public static class BoardManager
                 break;
             }
         }
-        return count >= TOKENS_TO_WIN;
+        return count >= _tokensToConnect;
     }
 
 
-    private static void CheckResult(TokenPlace lastTokenPlaced)
+    private static void CheckResult(TokenPlace lastTokenPlaced, int playerID)
     {
         if(IsWinInRow(lastTokenPlaced) || IsWinInCol(lastTokenPlaced) || IsWinLeftDiagonal(lastTokenPlaced) || IsWinRightDiagonal(lastTokenPlaced))
         {
-            gameResultEvent.Invoke((GameResults) GetToken(lastTokenPlaced));
+            gameResultEvent?.Invoke((GameResults)playerID); 
         }
         else
         {
             if (_tokensPlaced == _rows * _cols)
             {
-                gameResultEvent.Invoke(GameResults.DRAW);
+                gameResultEvent?.Invoke(GameResults.DRAW);
             }
         }
     }
