@@ -8,7 +8,9 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] Text _resultText;
     const string DrawMsg = "It's a Draw";
-    const string WinMsg = "Player # Wins!"; 
+    const string WinMsg = "Player # Wins!";
+
+    GameMode modeChosen;
 
     void ValidateParams()
     {
@@ -49,6 +51,27 @@ public class UIManager : MonoBehaviour
     {
         _resultText.text = msg;
         _resultText.gameObject.SetActive(true);
+    }
+
+    public void OnPVPChosen()
+    {
+        modeChosen = GameMode.PVP;
+    }
+
+    public void OnPVCChosen()
+    {
+        modeChosen = GameMode.PVC;
+
+    }
+
+    public void OnCVCChosen()
+    {
+        modeChosen = GameMode.CVC;
+    }
+
+    public void OnStartClicked()
+    {
+
     }
 
 

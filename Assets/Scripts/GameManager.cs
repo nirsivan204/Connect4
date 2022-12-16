@@ -14,7 +14,12 @@ using UnityEngine;
       System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 };*/
 
-
+public enum GameMode
+{
+    PVP,
+    PVC,
+    CVC
+}
 public class GameManager : MonoBehaviour
 {
     const int NUM_OF_ROWS = 7;

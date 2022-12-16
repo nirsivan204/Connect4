@@ -35,6 +35,10 @@ public static class BoardManager
     static int _cols;
     static int _numOfPlayers;
     static int _tokensToConnect;
+    static GameResults? _result = null;
+
+    public static int TokensPlaced { get => _tokensPlaced;  }
+    public static GameResults? Result { get => _result;  }
 
     public static void InitBoard(int rows, int cols)
     {
@@ -48,10 +52,11 @@ public static class BoardManager
         _cols = cols;
         _numOfPlayers = numOfPlayers;
         _tokensToConnect = tokensToConnect;
+        _result = null;
         _gameBoard = new int[rows, cols];
         for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; i < cols; i++)
+            for (int j = 0; j < cols; j++)
             {
                 _gameBoard[i, j] = 0;
             }
@@ -73,7 +78,7 @@ public static class BoardManager
     {
         if (_gameBoard[row, col] != 0)
         {
-            Debug.LogError("Not an empty space, can't put this token here");
+            throw new Exception("Not an empty space, can't put this token here");
         }
         _gameBoard[row, col] = playerID;
         _tokensPlaced++;
@@ -82,9 +87,13 @@ public static class BoardManager
 
     public static void PutToken(int col, int playerID)
     {
-        if (playerID == 0 || playerID > _numOfPlayers)
+        if (playerID <= 0 || playerID > _numOfPlayers)
         {
             throw new Exception("Tried putting illigal player token");
+        }
+        if (_result != null)
+        {
+            throw new Exception("Game already has a result, can't put more tokens");
         }
         for (int i = _rows-1; i >= 0; i--)
         {
@@ -227,13 +236,15 @@ public static class BoardManager
     {
         if(IsWinInRow(lastTokenPlaced) || IsWinInCol(lastTokenPlaced) || IsWinLeftDiagonal(lastTokenPlaced) || IsWinRightDiagonal(lastTokenPlaced))
         {
-            gameResultEvent?.Invoke((GameResults)playerID); 
+            gameResultEvent?.Invoke((GameResults)playerID);
+            _result = (GameResults)playerID;
         }
         else
         {
             if (_tokensPlaced == _rows * _cols)
             {
                 gameResultEvent?.Invoke(GameResults.DRAW);
+                _result = GameResults.DRAW;
             }
         }
     }
