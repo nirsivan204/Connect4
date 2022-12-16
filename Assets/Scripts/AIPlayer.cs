@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIPlayer : MonoBehaviour
+public class AIPlayer : AbstractPlayer
 {
     public enum Difficult
     {
@@ -11,13 +11,11 @@ public class AIPlayer : MonoBehaviour
         HARD,
     }
 
-    Difficult _difficultLevel;
-    delegate int CalculateNextMoveFunc(int[,] board);
+    delegate int CalculateNextMoveFunc(int[,] board = null);
     CalculateNextMoveFunc _nextMoveFunc;
 
-    public AIPlayer(Difficult level)
+    public AIPlayer(GameManager gameMgr, Difficult level) : base(gameMgr)
     {
-        _difficultLevel = level;
         switch (level)
         {
             case Difficult.EASY:
@@ -35,11 +33,15 @@ public class AIPlayer : MonoBehaviour
         }
     }
 
+    public override void StartTurn()
+    {
+        MakeTurn(_nextMoveFunc());
+    }
 
 
     int Easy(int[,] board)
     {
-        return Random.Range(0, board.GetLength(1)); 
+        return Random.Range(0, GameManager.NUM_OF_COLS); 
     }
 
     int Medium(int[,] board)

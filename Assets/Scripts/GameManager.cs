@@ -20,10 +20,10 @@ public enum GameMode
     PVC,
     CVC
 }
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour,IStateMachineClient
 {
-    const int NUM_OF_ROWS = 7;
-    const int NUM_OF_COLS = 6;
+    public const int NUM_OF_ROWS = 6; 
+    public const int NUM_OF_COLS = 7;
     const int NUM_OF_PLAYERS = 2;
     const int NUM_OF_TOKENS_TO_CONNECT = 4;
 
@@ -32,34 +32,62 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] ConnectGameGrid _gameBoard;
     [SerializeField] Disk[] playersDisks;
+    AbstractPlayer[] Players = new AbstractPlayer[NUM_OF_PLAYERS];
 
     int _turn = 0;
     IDisk _lastDiskPlaced = null;
+
+    public ConnectGameGrid GameBoard { get => _gameBoard; }
+
     // Start is called before the first frame update
     private void OnEnable()
     {
         BoardManager.gameResultEvent += OnGameFinished;
-        _gameBoard.ColumnClicked += TryMakeMove;
+        StateMachine.stateEnterEvent += OnEnterState;
+        StateMachine.stateExitEvent += OnExitState;
     }
 
     private void OnDisable()
     {
         BoardManager.gameResultEvent -= OnGameFinished;
-        _gameBoard.ColumnClicked -= TryMakeMove;
+        StateMachine.stateEnterEvent -= OnEnterState;
+        StateMachine.stateExitEvent -= OnExitState;
     }
 
-    private void Start()
+    private void OnValidate()
     {
         ValidateGame();
-        BoardManager.InitBoard(NUM_OF_ROWS, NUM_OF_COLS,NUM_OF_PLAYERS, NUM_OF_TOKENS_TO_CONNECT);
+    }
+
+    public void StartGame(GameMode mode)
+    {
+        BoardManager.InitBoard(NUM_OF_ROWS, NUM_OF_COLS, NUM_OF_PLAYERS, NUM_OF_TOKENS_TO_CONNECT);
+        switch (mode)
+        {
+            case GameMode.PVP:
+                Players[0] = new HumanPlayer(this);
+                Players[1] = new HumanPlayer(this);
+                break;
+            case GameMode.PVC:
+                Players[0] = new HumanPlayer(this);
+                Players[1] = new AIPlayer(this,AIPlayer.Difficult.EASY);
+                break;
+            case GameMode.CVC:
+                Players[0] = new AIPlayer(this, AIPlayer.Difficult.EASY);
+                Players[1] = new AIPlayer(this, AIPlayer.Difficult.EASY);
+                break;
+            default:
+                throw new Exception("Illigal Game Mode");
+        }
         _isGameEnded = false;
+        Players[0].StartTurn();
     }
 
     private void ValidateGame()
     {
         if(NUM_OF_PLAYERS < playersDisks.Length)
         {
-            throw new Exception("Disks not assigned to player");
+            throw new Exception("Some disks are not assigned to player");
         }
         if (NUM_OF_PLAYERS > playersDisks.Length)
         {
@@ -76,10 +104,13 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        _isTurnOngoing = true;
         if (IsLegalMove(col))
         {
             MakeMove(col);
+        }
+        else
+        {
+            Players[_turn].StartTurn();
         }
     }
 
@@ -87,6 +118,7 @@ public class GameManager : MonoBehaviour
 
     private void MakeMove(int col)
     {
+        _isTurnOngoing = true;
         Disk diskPrefab = playersDisks[_turn];
         _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, 0);
         _lastDiskPlaced.StoppedFalling += OnDiskStoppedFalling;
@@ -102,7 +134,9 @@ public class GameManager : MonoBehaviour
     private void FinishTurn()
     {
         _isTurnOngoing = false;
+        Players[_turn].EndTurn();
         _turn = (_turn + 1) % NUM_OF_PLAYERS;
+        Players[_turn].StartTurn();
     }
 
     private bool IsLegalMove(int col)
@@ -113,6 +147,42 @@ public class GameManager : MonoBehaviour
     private void OnGameFinished(GameResults result)
     {
         _isGameEnded = true;
+        PlayerPrefs.SetInt("GameResult", (int)result);
+        StateMachine.ChangeState(GameState.GAME_ENDED);
     }
 
+    public void OnEnterState(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.MANU:
+                _gameBoard.gameObject.SetActive(false);
+                break;
+            case GameState.GAME:
+                _gameBoard.gameObject.SetActive(true);
+                StartGame((GameMode)PlayerPrefs.GetInt("GameMode"));
+                break;
+            case GameState.GAME_ENDED:
+                _isGameEnded = true;
+                break;
+            default:
+                break;
+        };
+    }
+
+    public void OnExitState(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.MANU:
+                break;
+            case GameState.GAME:
+                _gameBoard.gameObject.SetActive(false);
+                break;
+            case GameState.GAME_ENDED:
+                break;
+            default:
+                break;
+        };
+    }
 }
