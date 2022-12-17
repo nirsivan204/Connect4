@@ -7,7 +7,11 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour,IStateMachineClient
 {
     [SerializeField] Text _resultText;
-    [SerializeField] GameObject manu;
+    [SerializeField] GameObject mainManu;
+    [SerializeField] GameObject manuButton;
+    [SerializeField] GameObject restartButton;
+    [SerializeField] GameObject pauseManu;
+    
     const string DrawMsg = "It's a Draw";
     const string WinMsg = "Player # Wins!";
 
@@ -39,7 +43,7 @@ public class UIManager : MonoBehaviour,IStateMachineClient
 
     private void OnGameEnded()
     {
-        GameResults result =(GameResults) PlayerPrefs.GetInt("GameResult");
+        GameResults result =(GameResults) PlayerPrefs.GetInt(StringsConsts.PPResult);
         if (result == GameResults.DRAW)
         {
             ShowMsg(DrawMsg);
@@ -52,7 +56,12 @@ public class UIManager : MonoBehaviour,IStateMachineClient
 
     public void OnRestartButtonPress()
     {
+        StateMachine.ChangeState(GameState.RESTART);
+    }
 
+    public void OnExitPausePress()
+    {
+        StateMachine.ChangeState(GameState.GAME);
     }
 
     private void ShowMsg(string msg)
@@ -79,8 +88,18 @@ public class UIManager : MonoBehaviour,IStateMachineClient
 
     public void OnStartClicked()
     {
-        PlayerPrefs.SetInt("GameMode", (int) modeChosen);
-        StateMachine.ChangeState(GameState.GAME);
+        PlayerPrefs.SetInt(StringsConsts.PPGameMode, (int) modeChosen);
+        if(StateMachine.currentState == GameState.PAUSE)
+        {
+            StateMachine.ChangeState(GameState.RESTART);
+        }
+        else
+        {
+            if(StateMachine.currentState == GameState.MANU)
+            {
+                StateMachine.ChangeState(GameState.GAME);
+            }
+        }
     }
 
 
@@ -89,17 +108,49 @@ public class UIManager : MonoBehaviour,IStateMachineClient
         switch (state)
         {
             case GameState.MANU:
-                manu.SetActive(true);
+                mainManu.SetActive(true);
                 break;
             case GameState.GAME:
-                manu.SetActive(false);
+                mainManu.SetActive(false);
+                restartButton.SetActive(true);
+                manuButton.SetActive(true);
                 break;
             case GameState.GAME_ENDED:
+                restartButton.SetActive(true);
+                manuButton.SetActive(true);
                 OnGameEnded();
+                break;
+            case GameState.PAUSE:
+                pauseManu.SetActive(true);
+                restartButton.SetActive(false);
+                manuButton.SetActive(false);
+                break;
+            case GameState.RESTART:
                 break;
             default:
                 break;
         }
+    }
+
+    public void OnOpenManuClick()
+    {
+        if (StateMachine.currentState == GameState.GAME)
+        {
+            StateMachine.ChangeState(GameState.PAUSE);
+
+        }
+        else
+        {
+            if(StateMachine.currentState == GameState.GAME_ENDED)
+            {
+                StateMachine.ChangeState(GameState.MANU);
+            }
+        }
+    }
+
+    public void OnMainManuClicked()
+    {
+        StateMachine.ChangeState(GameState.MANU);
     }
 
     public void OnExitState(GameState state)
@@ -107,11 +158,17 @@ public class UIManager : MonoBehaviour,IStateMachineClient
         switch (state)
         {
             case GameState.MANU:
-                manu.SetActive(false);
+                mainManu.SetActive(false);
                 break;
             case GameState.GAME:
                 break;
             case GameState.GAME_ENDED:
+                _resultText.gameObject.SetActive(false);
+                break;
+            case GameState.PAUSE:
+                pauseManu.SetActive(false);
+                break;
+            case GameState.RESTART:
                 break;
             default:
                 break;

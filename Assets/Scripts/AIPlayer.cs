@@ -35,6 +35,7 @@ public class AIPlayer : AbstractPlayer
 
     public override void StartTurn()
     {
+        base.StartTurn();
         MakeTurn(_nextMoveFunc());
     }
 

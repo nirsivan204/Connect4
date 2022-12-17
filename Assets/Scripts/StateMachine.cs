@@ -7,8 +7,22 @@ public enum GameState
 {
     MANU,
     GAME,
-    GAME_ENDED
+    GAME_ENDED,
+    PAUSE,
+    RESTART,
 }
+/// <summary>
+///       ------------Pause  Restart <----
+///       |            ^|     ^|          \
+///       |            ||     ||           \
+///       v            |v     |v            \
+/// Main Manu ----->     Game     ------>  Game_ended
+///     ^                                   |
+///     |                                   |
+///      -----------------------------------
+/// 
+/// 
+/// </summary>
 
 public static class StateMachine
 {
@@ -31,26 +45,3 @@ public static class StateMachine
         stateEnterEvent?.Invoke(currentState);
     }
 }
-/*
-// An example state
-public class ExampleState : IState
-{
-    // A reference to the state machine that this state belongs to
-    private StateMachine stateMachine;
-
-    public ExampleState(StateMachine stateMachine)
-    {
-        this.stateMachine = stateMachine;
-    }
-
-    public void Enter()
-    {
-        Debug.Log("Entering Example State");
-    }
-
-    public void Exit()
-    {
-        Debug.Log("Exiting Example State");
-    }
-}
-*/

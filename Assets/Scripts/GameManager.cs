@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /*public class MyException : Exception
 {
@@ -27,29 +28,38 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     const int NUM_OF_PLAYERS = 2;
     const int NUM_OF_TOKENS_TO_CONNECT = 4;
 
-    bool _isGameEnded = false;
+    bool _isGameInProgress = false;
     bool _isTurnOngoing = false;
 
     [SerializeField] ConnectGameGrid _gameBoard;
-    [SerializeField] Disk[] playersDisks;
-    AbstractPlayer[] Players = new AbstractPlayer[NUM_OF_PLAYERS];
+    [SerializeField] Disk[] _playersDisks;
+    AbstractPlayer[] _players = new AbstractPlayer[NUM_OF_PLAYERS];
 
     int _turn = 0;
     IDisk _lastDiskPlaced = null;
 
     public ConnectGameGrid GameBoard { get => _gameBoard; }
 
+    private void Start()
+    {
+        if(StateMachine.currentState == GameState.RESTART)
+        {
+            StateMachine.ChangeState(GameState.GAME);
+        }
+    }
+
+
     // Start is called before the first frame update
     private void OnEnable()
     {
-        BoardManager.gameResultEvent += OnGameFinished;
+        BoardManager.gameResultEvent += OnGameResult;
         StateMachine.stateEnterEvent += OnEnterState;
         StateMachine.stateExitEvent += OnExitState;
     }
 
     private void OnDisable()
     {
-        BoardManager.gameResultEvent -= OnGameFinished;
+        BoardManager.gameResultEvent -= OnGameResult;
         StateMachine.stateEnterEvent -= OnEnterState;
         StateMachine.stateExitEvent -= OnExitState;
     }
@@ -65,31 +75,31 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         switch (mode)
         {
             case GameMode.PVP:
-                Players[0] = new HumanPlayer(this);
-                Players[1] = new HumanPlayer(this);
+                _players[0] = new HumanPlayer(this);
+                _players[1] = new HumanPlayer(this);
                 break;
             case GameMode.PVC:
-                Players[0] = new HumanPlayer(this);
-                Players[1] = new AIPlayer(this,AIPlayer.Difficult.EASY);
+                _players[0] = new HumanPlayer(this);
+                _players[1] = new AIPlayer(this,AIPlayer.Difficult.EASY);
                 break;
             case GameMode.CVC:
-                Players[0] = new AIPlayer(this, AIPlayer.Difficult.EASY);
-                Players[1] = new AIPlayer(this, AIPlayer.Difficult.EASY);
+                _players[0] = new AIPlayer(this, AIPlayer.Difficult.EASY);
+                _players[1] = new AIPlayer(this, AIPlayer.Difficult.EASY);
                 break;
             default:
                 throw new Exception("Illigal Game Mode");
         }
-        _isGameEnded = false;
-        Players[0].StartTurn();
+        _isGameInProgress = true;
+        _players[0].StartTurn();
     }
 
     private void ValidateGame()
     {
-        if(NUM_OF_PLAYERS < playersDisks.Length)
+        if(NUM_OF_PLAYERS < _playersDisks.Length)
         {
             throw new Exception("Some disks are not assigned to player");
         }
-        if (NUM_OF_PLAYERS > playersDisks.Length)
+        if (NUM_OF_PLAYERS > _playersDisks.Length)
         {
             throw new Exception("Some players doesn't have a disk assigned to them");
         }
@@ -100,7 +110,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
 
     public void TryMakeMove(int col)
     {
-        if (_isGameEnded || _isTurnOngoing)
+        if (!_isGameInProgress || _isTurnOngoing)
         {
             return;
         }
@@ -110,7 +120,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         }
         else
         {
-            Players[_turn].StartTurn();
+            _players[_turn].StartTurn();
         }
     }
 
@@ -119,7 +129,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     private void MakeMove(int col)
     {
         _isTurnOngoing = true;
-        Disk diskPrefab = playersDisks[_turn];
+        Disk diskPrefab = _playersDisks[_turn];
         _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, 0);
         _lastDiskPlaced.StoppedFalling += OnDiskStoppedFalling;
         BoardManager.PutToken(col, _turn+1);
@@ -134,9 +144,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     private void FinishTurn()
     {
         _isTurnOngoing = false;
-        Players[_turn].EndTurn();
-        _turn = (_turn + 1) % NUM_OF_PLAYERS;
-        Players[_turn].StartTurn();
+        ChangeTurn();
     }
 
     private bool IsLegalMove(int col)
@@ -144,11 +152,14 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         return BoardManager.IsEmpty(0, col);
     }
 
-    private void OnGameFinished(GameResults result)
+    private void OnGameResult(GameResults result)
     {
-        _isGameEnded = true;
-        PlayerPrefs.SetInt("GameResult", (int)result);
-        StateMachine.ChangeState(GameState.GAME_ENDED);
+        PlayerPrefs.SetInt(StringsConsts.PPResult, (int)result);
+        _isGameInProgress = false;
+    }
+
+    private void OnGameFinished()
+    {
     }
 
     public void OnEnterState(GameState state)
@@ -156,18 +167,41 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         switch (state)
         {
             case GameState.MANU:
-                _gameBoard.gameObject.SetActive(false);
+                RestartGame();
                 break;
             case GameState.GAME:
                 _gameBoard.gameObject.SetActive(true);
-                StartGame((GameMode)PlayerPrefs.GetInt("GameMode"));
+                if (!_isGameInProgress)
+                {
+                    StartGame((GameMode)PlayerPrefs.GetInt(StringsConsts.PPGameMode));
+                }
                 break;
             case GameState.GAME_ENDED:
-                _isGameEnded = true;
+                OnGameFinished();
+                break;
+            case GameState.PAUSE:
+                OnPause();
+                break;
+            case GameState.RESTART:
+                RestartGame();
                 break;
             default:
                 break;
         };
+    }
+
+    private void RestartGame()
+    {
+        _isGameInProgress = false;
+        SceneManager.LoadScene(0);
+    }
+
+    private void ResumeGame()
+    {
+        if (_isGameInProgress)
+        {
+            _players[_turn].StartTurn();
+        }
     }
 
     public void OnExitState(GameState state)
@@ -181,8 +215,31 @@ public class GameManager : MonoBehaviour,IStateMachineClient
                 break;
             case GameState.GAME_ENDED:
                 break;
+            case GameState.PAUSE:
+                ResumeGame();
+                break;
+            case GameState.RESTART:
+                break;
             default:
                 break;
         };
     }
+
+    private void ChangeTurn()
+    {
+        _players[_turn].EndTurn();
+        if (!_isGameInProgress)
+        {
+            StateMachine.ChangeState(GameState.GAME_ENDED);
+            return;
+        }
+        _turn = (_turn + 1) % NUM_OF_PLAYERS;
+        _players[_turn].StartTurn();
+    }
+
+    private void OnPause()
+    {
+        _players[_turn].EndTurn();
+    }
+
 }
