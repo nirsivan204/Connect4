@@ -21,7 +21,7 @@ public enum GameMode
     PVC,
     CVC
 }
-public class GameManager : MonoBehaviour,IStateMachineClient
+public class GameManager : AbstractManager
 {
     public const int NUM_OF_ROWS = 6; 
     public const int NUM_OF_COLS = 7;
@@ -44,29 +44,21 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     {
         if(StateMachine.currentState == GameState.RESTART)
         {
-            StateMachine.ChangeState(GameState.GAME);
+            StateMachine.SetNextState(GameState.GAME);
         }
     }
 
-
     // Start is called before the first frame update
-    private void OnEnable()
+    protected override void OnEnable()
     {
         BoardManager.gameResultEvent += OnGameResult;
-        StateMachine.stateEnterEvent += OnEnterState;
-        StateMachine.stateExitEvent += OnExitState;
+        base.OnEnable();
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
         BoardManager.gameResultEvent -= OnGameResult;
-        StateMachine.stateEnterEvent -= OnEnterState;
-        StateMachine.stateExitEvent -= OnExitState;
-    }
-
-    private void OnValidate()
-    {
-        ValidateGame();
+        base.OnDisable();
     }
 
     public void StartGame(GameMode mode)
@@ -93,7 +85,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         _players[0].StartTurn();
     }
 
-    private void ValidateGame()
+    protected override void ValidateParams()
     {
         if(NUM_OF_PLAYERS < _playersDisks.Length)
         {
@@ -103,8 +95,6 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         {
             throw new Exception("Some players doesn't have a disk assigned to them");
         }
-
-
     }
 
 
@@ -162,7 +152,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     {
     }
 
-    public void OnEnterState(GameState state)
+    public override void OnEnterState(GameState state)
     {
         switch (state)
         {
@@ -193,7 +183,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
     private void RestartGame()
     {
         _isGameInProgress = false;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(StringsConsts.GameSceneName);
     }
 
     private void ResumeGame()
@@ -204,7 +194,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         }
     }
 
-    public void OnExitState(GameState state)
+    public override void OnExitState(GameState state)
     {
         switch (state)
         {
@@ -230,7 +220,7 @@ public class GameManager : MonoBehaviour,IStateMachineClient
         _players[_turn].EndTurn();
         if (!_isGameInProgress)
         {
-            StateMachine.ChangeState(GameState.GAME_ENDED);
+            StateMachine.SetNextState(GameState.GAME_ENDED);
             return;
         }
         _turn = (_turn + 1) % NUM_OF_PLAYERS;

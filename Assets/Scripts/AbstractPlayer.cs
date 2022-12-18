@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AbstractPlayer
+public abstract class AbstractPlayer
 {
     protected bool isMyTurn;
     protected GameManager _gameMgr;

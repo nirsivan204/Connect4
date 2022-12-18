@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour,IStateMachineClient
+public class UIManager : AbstractManager
 {
     [SerializeField] Text _resultText;
     [SerializeField] GameObject mainManu;
@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour,IStateMachineClient
     const string WinMsg = "Player # Wins!";
 
     GameMode modeChosen;
-    void ValidateParams()
+    protected override void ValidateParams()
     {
         if (!WinMsg.Contains("#"))
         {
@@ -27,18 +27,6 @@ public class UIManager : MonoBehaviour,IStateMachineClient
     private void OnValidate()
     {
         ValidateParams();
-    }
-
-    void OnEnable()
-    {
-        StateMachine.stateEnterEvent += OnEnterState;
-        StateMachine.stateExitEvent += OnExitState;
-    }
-
-    void OnDisable()
-    {
-        StateMachine.stateEnterEvent -= OnEnterState;
-        StateMachine.stateExitEvent -= OnExitState;
     }
 
     private void OnGameEnded()
@@ -56,12 +44,12 @@ public class UIManager : MonoBehaviour,IStateMachineClient
 
     public void OnRestartButtonPress()
     {
-        StateMachine.ChangeState(GameState.RESTART);
+        StateMachine.SetNextState(GameState.RESTART);
     }
 
     public void OnExitPausePress()
     {
-        StateMachine.ChangeState(GameState.GAME);
+        StateMachine.SetNextState(GameState.GAME);
     }
 
     private void ShowMsg(string msg)
@@ -91,19 +79,19 @@ public class UIManager : MonoBehaviour,IStateMachineClient
         PlayerPrefs.SetInt(StringsConsts.PPGameMode, (int) modeChosen);
         if(StateMachine.currentState == GameState.PAUSE)
         {
-            StateMachine.ChangeState(GameState.RESTART);
+            StateMachine.SetNextState(GameState.RESTART);
         }
         else
         {
             if(StateMachine.currentState == GameState.MANU)
             {
-                StateMachine.ChangeState(GameState.GAME);
+                StateMachine.SetNextState(GameState.GAME);
             }
         }
     }
 
 
-    public void OnEnterState(GameState state)
+    public override void OnEnterState(GameState state)
     {
         switch (state)
         {
@@ -136,24 +124,24 @@ public class UIManager : MonoBehaviour,IStateMachineClient
     {
         if (StateMachine.currentState == GameState.GAME)
         {
-            StateMachine.ChangeState(GameState.PAUSE);
+            StateMachine.SetNextState(GameState.PAUSE);
 
         }
         else
         {
             if(StateMachine.currentState == GameState.GAME_ENDED)
             {
-                StateMachine.ChangeState(GameState.MANU);
+                StateMachine.SetNextState(GameState.MANU);
             }
         }
     }
 
     public void OnMainManuClicked()
     {
-        StateMachine.ChangeState(GameState.MANU);
+        StateMachine.SetNextState(GameState.MANU);
     }
 
-    public void OnExitState(GameState state)
+    public override void OnExitState(GameState state)
     {
         switch (state)
         {
