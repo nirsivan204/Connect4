@@ -40,13 +40,6 @@ public class GameManager : AbstractManager
 
     public ConnectGameGrid GameBoard { get => _gameBoard; }
 
-    private void Start()
-    {
-        if(StateMachine.currentState == GameState.RESTART)
-        {
-            StateMachine.SetNextState(GameState.GAME);
-        }
-    }
 
     // Start is called before the first frame update
     protected override void OnEnable()
@@ -157,7 +150,6 @@ public class GameManager : AbstractManager
         switch (state)
         {
             case GameState.MANU:
-                RestartGame();
                 break;
             case GameState.GAME:
                 _gameBoard.gameObject.SetActive(true);
@@ -179,6 +171,7 @@ public class GameManager : AbstractManager
                 break;
         };
     }
+
 
     private void RestartGame()
     {

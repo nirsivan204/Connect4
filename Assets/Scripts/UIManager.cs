@@ -45,6 +45,7 @@ public class UIManager : AbstractManager
     public void OnRestartButtonPress()
     {
         StateMachine.SetNextState(GameState.RESTART);
+        StateMachine.SetNextState(GameState.GAME);
     }
 
     public void OnExitPausePress()
@@ -77,17 +78,7 @@ public class UIManager : AbstractManager
     public void OnStartClicked()
     {
         PlayerPrefs.SetInt(StringsConsts.PPGameMode, (int) modeChosen);
-        if(StateMachine.currentState == GameState.PAUSE)
-        {
-            StateMachine.SetNextState(GameState.RESTART);
-        }
-        else
-        {
-            if(StateMachine.currentState == GameState.MANU)
-            {
-                StateMachine.SetNextState(GameState.GAME);
-            }
-        }
+        StateMachine.SetNextState(GameState.GAME);
     }
 
 
@@ -131,6 +122,7 @@ public class UIManager : AbstractManager
         {
             if(StateMachine.currentState == GameState.GAME_ENDED)
             {
+                StateMachine.SetNextState(GameState.RESTART);
                 StateMachine.SetNextState(GameState.MANU);
             }
         }
@@ -138,6 +130,7 @@ public class UIManager : AbstractManager
 
     public void OnMainManuClicked()
     {
+        StateMachine.SetNextState(GameState.RESTART);
         StateMachine.SetNextState(GameState.MANU);
     }
 

@@ -12,14 +12,14 @@ public enum GameState
     RESTART,
 }
 /// <summary>
-///       ------------Pause  Restart <----
+///       ----------------------
+///       |                    |
+///       |           Pause->Restart <----
 ///       |            ^|     ^|          \
 ///       |            ||     ||           \
 ///       v            |v     |v            \
 /// Main Manu ----->     Game     ------>  Game_ended
-///     ^                                   |
-///     |                                   |
-///      -----------------------------------
+///     
 /// 
 /// 
 /// </summary>

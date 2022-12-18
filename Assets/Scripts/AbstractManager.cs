@@ -15,6 +15,7 @@ public abstract class AbstractManager : MonoBehaviour,IStateMachineClient
 
     protected virtual void OnEnable()
     {
+        OnEnterState(StateMachine.currentState);
         StateMachine.StateEnterEvent += OnEnterState;
         StateMachine.StateExitEvent += OnExitState;
     }
