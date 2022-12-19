@@ -125,7 +125,16 @@ public class GameManager : AbstractManager
     private void FinishTurn()
     {
         _isTurnOngoing = false;
-        ChangeTurn();
+        _players[_turn].EnableControls(false);
+        if (!_isGameInProgress)
+        {
+            StateMachine.SetNextState(GameState.GAME_ENDED);
+            return;
+        }
+        else
+        {
+            ChangeTurn();
+        }
     }
 
     private bool IsLegalMove(int col)
@@ -210,12 +219,6 @@ public class GameManager : AbstractManager
 
     private void ChangeTurn()
     {
-        _players[_turn].EnableControls(false);
-        if (!_isGameInProgress)
-        {
-            StateMachine.SetNextState(GameState.GAME_ENDED);
-            return;
-        }
         _turn = (_turn + 1) % NUM_OF_PLAYERS;
         _players[_turn].EnableControls(true);
     }

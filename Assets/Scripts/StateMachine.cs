@@ -35,13 +35,7 @@ public static class StateMachine
 
 
     /// <summary>
-    /// Change to a new state atomically. While changing to a new state, another state-change can be requested before the previous was ended. 
-    /// This implementation will allow the second state change, but under 2 conditions:
-    /// 1. The first change ended completely (All listeners of both exit and enter event finished running)
-    /// 2. During a change, only one additional state change can be saved to be right after that in the queue. When the second change will start, the user can request another one.  
-    /// 
-    /// This is a defensive programming mathodology.
-    /// This state machine supports moving from one state to another, and it can't allow registering 2 different next-states from the same state.
+    /// Change to a new state atomically. If more state changes are in queue, make them too.
     /// 
     ///
     /// </summary>
@@ -57,31 +51,36 @@ public static class StateMachine
         // Enter the new state
         StateEnterEvent?.Invoke(currentState);
         _isChangingState = false;
-        //If queue not empty
-        if (_stateInQueue != null)
+
+        GameState? nextStateInQueue;
+        if (GetNextStateFromQueue(out nextStateInQueue))
         {
-            // Save in a temporary var
-            GameState newState = (GameState)_stateInQueue;
-            // Empty the queue
-            _stateInQueue = null;
             // Call next change
-            ChangeState(newState);
+            ChangeState((GameState)nextStateInQueue);
         }
+
     }
+
+    /// <summary>
+    /// request a state change.
+    /// 
+    /// While changing to a new state, another state-change can be requested before the previous was ended. (In current project it will never happen, but it can be required for other projects, or extensions).
+    /// This implementation will allow the second state change, but under 2 conditions:
+    /// 1. The first change ended completely (All listeners of both exit and enter event finished running)
+    /// 2. During a change, only one additional state change can be saved to be right after that in the queue. When the second change will start, the user can request another one.  
+    /// 
+    /// This is a defensive programming mathodology.
+    /// This state machine supports moving from one state to another, and it can't allow registering 2 different next-states from the same state.
+    /// 
+    ///
+    /// </summary>
 
     public static void SetNextState(GameState nextState)
     {
-        //If not during a state change
+        //If during a state change
         if (_isChangingState)
         {
-            //If user requested a different state from the one he already requested, it is not allowed
-            if (_stateInQueue != null && _stateInQueue != nextState)
-            {
-                throw new Exception("Two different states were registered to be the next state, this is not allowed");
-            }
-            //Save next state in queue
-            _stateInQueue = nextState;
-            return;
+            TryAddToQueue(nextState);
         }
         else
         {
@@ -89,4 +88,30 @@ public static class StateMachine
         }
     }
 
+    private static bool GetNextStateFromQueue(out GameState? nextState)
+    {
+        nextState = null;
+        //If queue not empty
+        if (_stateInQueue != null)
+        {
+            // Save in a temporary var
+            nextState = (GameState)_stateInQueue;
+            // Empty the queue
+            _stateInQueue = null;
+            return true;
+        }
+        return false;
+    }
+
+    private static void TryAddToQueue(GameState nextState)
+    {
+        //If user requested a different state from the one he already requested, it is not allowed
+        if (_stateInQueue != null && _stateInQueue != nextState)
+        {
+            throw new Exception("Two different states were registered to be the next state, this is not allowed");
+        }
+        //Save next state in queue
+        _stateInQueue = nextState;
+        return;
+    }
 }
