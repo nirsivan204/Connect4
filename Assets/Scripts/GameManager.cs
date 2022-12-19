@@ -76,6 +76,7 @@ public class GameManager : AbstractManager
         }
         _isGameInProgress = true;
         _players[0].StartTurn();
+        AudioManager.Instance.PlaySound(SoundType.GameStart);
     }
 
     protected override void ValidateParams()
@@ -115,12 +116,14 @@ public class GameManager : AbstractManager
         Disk diskPrefab = _playersDisks[_turn];
         _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, 0);
         _lastDiskPlaced.StoppedFalling += OnDiskStoppedFalling;
+        AudioManager.Instance.PlaySound(SoundType.Click);
         BoardManager.PutToken(col, _turn+1);
     }
 
     private void OnDiskStoppedFalling()
     {
         _lastDiskPlaced.StoppedFalling -= OnDiskStoppedFalling;
+        AudioManager.Instance.PlaySound(SoundType.DiskFall);
         FinishTurn();
     }
 
@@ -143,6 +146,7 @@ public class GameManager : AbstractManager
 
     private void OnGameFinished()
     {
+        AudioManager.Instance.PlaySound(SoundType.Win);
     }
 
     public override void OnEnterState(GameState state)
@@ -150,6 +154,7 @@ public class GameManager : AbstractManager
         switch (state)
         {
             case GameState.MANU:
+                AudioManager.Instance.PlaySound(SoundType.BG_Music,true);
                 break;
             case GameState.GAME:
                 _gameBoard.gameObject.SetActive(true);

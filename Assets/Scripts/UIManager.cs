@@ -44,12 +44,14 @@ public class UIManager : AbstractManager
 
     public void OnRestartButtonPress()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.RESTART);
         StateMachine.SetNextState(GameState.GAME);
     }
 
     public void OnExitPausePress()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.GAME);
     }
 
@@ -61,22 +63,26 @@ public class UIManager : AbstractManager
 
     public void OnPVPChosen()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         modeChosen = GameMode.PVP;
     }
 
     public void OnPVCChosen()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         modeChosen = GameMode.PVC;
 
     }
 
     public void OnCVCChosen()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         modeChosen = GameMode.CVC;
     }
 
     public void OnStartClicked()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         PlayerPrefs.SetInt(StringsConsts.PPGameMode, (int) modeChosen);
         StateMachine.SetNextState(GameState.GAME);
     }
@@ -113,6 +119,7 @@ public class UIManager : AbstractManager
 
     public void OnOpenManuClick()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         if (StateMachine.currentState == GameState.GAME)
         {
             StateMachine.SetNextState(GameState.PAUSE);
@@ -130,6 +137,7 @@ public class UIManager : AbstractManager
 
     public void OnMainManuClicked()
     {
+        AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.RESTART);
         StateMachine.SetNextState(GameState.MANU);
     }
