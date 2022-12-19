@@ -112,9 +112,15 @@ public class GameManager : AbstractManager
 
     private void MakeMove(int col)
     {
+        int row = BoardManager.FindUpperMostEmptyPlace(col);
+        if(row == -1) 
+        {
+            return; // should never get here, because checking if legal move before
+        }
         _isTurnOngoing = true;
         Disk diskPrefab = _playersDisks[_turn];
-        _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, 0);
+
+        _lastDiskPlaced = _gameBoard.Spawn(diskPrefab, col, row);
         _lastDiskPlaced.StoppedFalling += OnDiskStoppedFalling;
         AudioManager.Instance.PlaySound(SoundType.Click);
         BoardManager.PutToken(col, _turn+1);
@@ -135,7 +141,7 @@ public class GameManager : AbstractManager
 
     private bool IsLegalMove(int col)
     {
-        return BoardManager.IsEmpty(0, col);
+        return BoardManager.IsEmpty(NUM_OF_ROWS-1, col);
     }
 
     private void OnGameResult(GameResults result)

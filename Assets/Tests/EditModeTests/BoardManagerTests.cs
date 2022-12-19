@@ -91,8 +91,8 @@ public class BoardManagerTests
 
         //validate put and get
         MakeABoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
-        Assert.AreEqual(2, BoardManager.GetToken(0, 0));
-        Assert.AreEqual(1, BoardManager.GetToken(1, 0));
+        Assert.AreEqual(2, BoardManager.GetToken(3, 0));
+        Assert.AreEqual(1, BoardManager.GetToken(2, 0));
 
         //validate isEmpty
         MakeABoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });

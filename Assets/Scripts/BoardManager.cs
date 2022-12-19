@@ -95,19 +95,29 @@ public static class BoardManager
         {
             throw new Exception("Game already has a result, can't put more tokens");
         }
-        for (int i = _rows-1; i >= 0; i--)
+        int row = FindUpperMostEmptyPlace(col);
+        if(row == -1)
         {
-            if(GetToken(i,col) == 0)
-            {
-                SetToken(i, col, playerID);
-                return;
-            }
+            throw new Exception("Tried putting player token in a full column");
         }
-        throw new Exception("Tried putting player token in a full column");
+        else
+        {
+            SetToken( row, col, playerID);
+        }
     }
 
+    public static int FindUpperMostEmptyPlace(int col)
+    {
+        for (int i = 0; i < _rows; i++)
+        {
+            if (IsEmpty(i,col))
+            {
+                return i;
+            }
 
-
+        }
+        return -1; //No empty Place in col
+    }
 
     private static bool IsWinInRow(TokenPlace place)
     {
