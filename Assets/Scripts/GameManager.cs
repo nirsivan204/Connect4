@@ -5,16 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/*public class MyException : Exception
-{
-    public MyException() { }
-    public MyException(string message) : base(message) { }
-    public MyException(string message, Exception inner) : base(message, inner) { }
-    protected MyException(
-      System.Runtime.Serialization.SerializationInfo info,
-      System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-};*/
-
 public enum GameMode
 {
     PVP,
@@ -41,7 +31,6 @@ public class GameManager : AbstractManager
     public ConnectGameGrid GameBoard { get => _gameBoard; }
 
 
-    // Start is called before the first frame update
     protected override void OnEnable()
     {
         BoardManager.gameResultEvent += OnGameResult;
@@ -75,7 +64,7 @@ public class GameManager : AbstractManager
                 throw new Exception("Illigal Game Mode");
         }
         _isGameInProgress = true;
-        _players[0].StartTurn();
+        _players[0].EnableControls(true);
         AudioManager.Instance.PlaySound(SoundType.GameStart);
     }
 
@@ -104,7 +93,7 @@ public class GameManager : AbstractManager
         }
         else
         {
-            _players[_turn].StartTurn();
+            _players[_turn].EnableControls(true);
         }
     }
 
@@ -115,7 +104,7 @@ public class GameManager : AbstractManager
         int row = BoardManager.FindUpperMostEmptyPlace(col);
         if(row == -1) 
         {
-            return; // should never get here, because checking if legal move before
+            throw new Exception("Illigal move, column is full"); // should never get here, because checking if legal move before, but just in case
         }
         _isTurnOngoing = true;
         Disk diskPrefab = _playersDisks[_turn];
@@ -194,7 +183,7 @@ public class GameManager : AbstractManager
     {
         if (_isGameInProgress)
         {
-            _players[_turn].StartTurn();
+            _players[_turn].EnableControls(true);
         }
     }
 
@@ -221,19 +210,19 @@ public class GameManager : AbstractManager
 
     private void ChangeTurn()
     {
-        _players[_turn].EndTurn();
+        _players[_turn].EnableControls(false);
         if (!_isGameInProgress)
         {
             StateMachine.SetNextState(GameState.GAME_ENDED);
             return;
         }
         _turn = (_turn + 1) % NUM_OF_PLAYERS;
-        _players[_turn].StartTurn();
+        _players[_turn].EnableControls(true);
     }
 
     private void OnPause()
     {
-        _players[_turn].EndTurn();
+        _players[_turn].EnableControls(false);
     }
 
 }

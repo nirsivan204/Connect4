@@ -33,10 +33,13 @@ public class AIPlayer : AbstractPlayer
         }
     }
 
-    public override void StartTurn()
+    public override void EnableControls(bool isEnabled)
     {
-        base.StartTurn();
-        MakeTurn(_nextMoveFunc());
+        base.EnableControls(isEnabled);
+        if (isEnabled)
+        {
+            MakeTurn(_nextMoveFunc());
+        }
     }
 
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class AbstractPlayer
 {
-    protected bool isMyTurn;
+    protected bool _canPlay;
     protected GameManager _gameMgr;
 
     public AbstractPlayer(GameManager gameMgr)
@@ -17,21 +17,14 @@ public abstract class AbstractPlayer
 
     }
 
-
-    public void EndTurn()
+    public virtual void EnableControls(bool isEnabled)
     {
-        isMyTurn = false;
-
-    }
-
-    public virtual void StartTurn()
-    {
-        isMyTurn = true;
+        _canPlay = isEnabled;
     }
 
     public virtual void MakeTurn(int col)
     {
-        if (isMyTurn)
+        if (_canPlay)
         {
             _gameMgr.TryMakeMove(col);
         }
