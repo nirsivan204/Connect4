@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Difficult
+{
+    EASY,
+    MEDIUM,
+    HARD,
+}
+
 public class AIPlayer : AbstractPlayer
 {
-    public enum Difficult
-    {
-        EASY,
-        MEDIUM,
-        HARD,
-    }
 
     delegate int CalculateNextMoveFunc(int[,] board = null);
     CalculateNextMoveFunc _nextMoveFunc;

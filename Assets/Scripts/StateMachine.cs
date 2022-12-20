@@ -10,6 +10,7 @@ public enum GameState
     GAME_ENDED,
     PAUSE,
     RESTART,
+    SETTINGS,
 }
 /// <summary>
 ///       ----------------------
@@ -19,8 +20,9 @@ public enum GameState
 ///       |            ||     ||           \
 ///       v            |v     |v            \
 /// Main Manu ----->     Game     ------>  Game_ended
-///     
-/// 
+///       |^
+///       v|
+/// Settings Manu
 /// 
 /// </summary>
 

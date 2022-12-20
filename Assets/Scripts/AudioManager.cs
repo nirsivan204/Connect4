@@ -133,5 +133,16 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
+
+    public void SetMusicVol(float val)
+    {
+        SoundSourceRefList[(int)AudioSourceType.Music].AudioSourceRef.volume = val;
+    }
+
+    public void SetSFXVol(float val)
+    {
+        SoundSourceRefList[(int)AudioSourceType.UI].AudioSourceRef.volume = val;
+        SoundSourceRefList[(int)AudioSourceType.Gameplay].AudioSourceRef.volume = val;
+    }
 }
 

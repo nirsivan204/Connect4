@@ -11,6 +11,7 @@ public class UIManager : AbstractManager
     [SerializeField] GameObject manuButton;
     [SerializeField] GameObject restartButton;
     [SerializeField] GameObject pauseManu;
+    [SerializeField] GameObject SettingsManu;
     
     const string DrawMsg = "It's a Draw";
     const string WinMsg = "Player # Wins!";
@@ -112,6 +113,10 @@ public class UIManager : AbstractManager
                 break;
             case GameState.RESTART:
                 break;
+            case GameState.SETTINGS:
+                mainManu.SetActive(false);
+                SettingsManu.SetActive(true);
+                break;
             default:
                 break;
         }
@@ -142,6 +147,18 @@ public class UIManager : AbstractManager
         StateMachine.SetNextState(GameState.MANU);
     }
 
+    public void OnOpenSettings()
+    {
+        AudioManager.Instance.PlaySound(SoundType.Click);
+        StateMachine.SetNextState(GameState.SETTINGS);
+    }
+
+    public void OnCloseSettings()
+    {
+        AudioManager.Instance.PlaySound(SoundType.Click);
+        StateMachine.SetNextState(GameState.MANU);
+    }
+
     public override void OnExitState(GameState state)
     {
         switch (state)
@@ -159,10 +176,27 @@ public class UIManager : AbstractManager
                 break;
             case GameState.RESTART:
                 break;
+            case GameState.SETTINGS:
+                SettingsManu.SetActive(false);
+                break;
             default:
                 break;
         };
     }
 
 
+    public void OnMusicVolChange(float val)
+    {
+        AudioManager.Instance.SetMusicVol(val);
+    }
+
+    public void OnSFXVolChange(float val)
+    {
+        AudioManager.Instance.SetSFXVol(val);
+    }
+
+    public void OnDifficultChange(int val)
+    {
+        GameData.CurrentGameDifficulty = (Difficult) val;
+    }
 }
