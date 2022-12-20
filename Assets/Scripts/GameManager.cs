@@ -28,7 +28,8 @@ public class GameManager : AbstractManager
     // I decided to use the serializedField attribute with dragging in the inspector for the board,
     // instead of using reference to the asset in the Resources folder for simplicity.
     // 
-    // This class doesn't need many references so it is ok to use the dragging method,
+    // This class doesn't need many references so it is ok to use the dragging method.
+
     // The best way to do it will be using depenedency injection or asset bundles, but it is an overkill for this project.
     // 
     */
