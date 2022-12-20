@@ -138,6 +138,11 @@ public class GameManager : AbstractManager
     protected override void OnDisable()
     {
         BoardManager.gameResultEvent -= OnGameResult;
+        //Unsubscribe from event to prevent memory leak if destroyed before the StoppedFalling event happened
+        if (_lastDiskPlaced != null)
+        {
+            _lastDiskPlaced.StoppedFalling -= OnDiskStoppedFalling;
+        }
         base.OnDisable();
     }
 
