@@ -57,7 +57,9 @@ public class AIPlayer : AbstractPlayer
 
     private int Hard(int[,] board)
     {
+        //todo: min max algorithem
         throw new System.NotImplementedException();
     }
+
 
 }

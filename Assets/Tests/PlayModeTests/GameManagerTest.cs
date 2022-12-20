@@ -36,7 +36,7 @@ public class GameManagerTest
     {
         GameManagerMock GM = GameObject.Instantiate(new GameObject()).AddComponent<GameManagerMock>();
 
-        GM.SetBoard(GameObject.Instantiate(Resources.Load<GameObject>(StringsConsts.BoardName)).GetComponentInChildren<ConnectGameGrid>());  //new GameObject().AddComponent<MockBoard>());
+        GM.SetBoard(GameObject.Instantiate(Resources.Load<GameObject>(StringsConsts.BoardName)).GetComponentInChildren<ConnectGameGrid>());
         GM.SetPlayerTokens(new Disk[2] { Resources.Load<GameObject>(StringsConsts.DiskAName).GetComponentInChildren<Disk>(), Resources.Load<GameObject>(StringsConsts.DiskBName).GetComponentInChildren<Disk>() });
 
         return GM;
@@ -47,15 +47,18 @@ public class GameManagerTest
     public void SetupScene()
     {
         GameObject.Instantiate(new GameObject().AddComponent<AudioManagerMock>());
+
     }
 
 
     [UnityTest]
+    //This test will check an example game, where player1 wins.
+    //It checks turn switch, and basic game functionality
     public IEnumerator GameManagerTestWithEnumeratorPasses()
     {
         testObject = CreateGameManager();
         StateMachine.SetNextState(GameState.GAME);
-        yield return new WaitForSeconds(0.2f);
+        yield return null;
         MakeMove(0);
         yield return new WaitUntil(IsStoppedFalling);
         MakeMove(1);
