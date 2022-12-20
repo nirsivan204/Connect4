@@ -31,7 +31,7 @@ public class UIManager : AbstractManager
 
     private void OnGameEnded()
     {
-        GameResults result =(GameResults) PlayerPrefs.GetInt(StringsConsts.PPResult);
+        GameResults result = GameData.CurrentGameResults;
         if (result == GameResults.DRAW)
         {
             ShowMsg(DrawMsg);
@@ -83,7 +83,7 @@ public class UIManager : AbstractManager
     public void OnStartClicked()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
-        PlayerPrefs.SetInt(StringsConsts.PPGameMode, (int) modeChosen);
+        GameData.CurrentGameMode = modeChosen;
         StateMachine.SetNextState(GameState.GAME);
     }
 

@@ -70,11 +70,11 @@ public class GameManager : AbstractManager
                 break;
             case GameMode.PVC:
                 _players[0] = new HumanPlayer(this);
-                _players[1] = new AIPlayer(this,AIPlayer.Difficult.EASY);
+                _players[1] = new AIPlayer(this, GameData.CurrentGameDifficulty);
                 break;
             case GameMode.CVC:
-                _players[0] = new AIPlayer(this, AIPlayer.Difficult.EASY);
-                _players[1] = new AIPlayer(this, AIPlayer.Difficult.EASY);
+                _players[0] = new AIPlayer(this, GameData.CurrentGameDifficulty);
+                _players[1] = new AIPlayer(this, GameData.CurrentGameDifficulty);
                 break;
             default:
                 throw new Exception("Illigal Game Mode");
@@ -161,7 +161,7 @@ public class GameManager : AbstractManager
 
     private void OnGameResult(GameResults result)
     {
-        PlayerPrefs.SetInt(StringsConsts.PPResult, (int)result);
+        GameData.CurrentGameResults = result;
         _isGameInProgress = false;
     }
 
@@ -181,7 +181,7 @@ public class GameManager : AbstractManager
                 _gameBoard.gameObject.SetActive(true);
                 if (!_isGameInProgress)
                 {
-                    StartGame((GameMode)PlayerPrefs.GetInt(StringsConsts.PPGameMode));
+                    StartGame(GameData.CurrentGameMode);
                 }
                 break;
             case GameState.GAME_ENDED:
