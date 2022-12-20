@@ -13,13 +13,27 @@ public enum GameMode
 }
 public class GameManager : AbstractManager
 {
+    #region Constants
     public const int NUM_OF_ROWS = 6; 
     public const int NUM_OF_COLS = 7;
     const int NUM_OF_PLAYERS = 2;
     const int NUM_OF_TOKENS_TO_CONNECT = 4;
+    #endregion
+    #region PrivateParams
 
     bool _isGameInProgress = false;
     bool _isTurnOngoing = false;
+    /* 
+    // I decided to use the serializedField attribute with dragging in the inspector,
+    // instead of using references to assets in the resources folder. That is because all assets in the Resources folders will be included in a build.
+    // This means that every change of an asset will require:
+    //     1. updating the name and the reference to it.
+    //     2. deleting the old asset, so it will not be included in the build.
+    // 
+    // This class doesn't need many references so it is ok to use the dragging method.
+    // The best way to do it will be using depenedency injection or asset bundles, but it is an overkill for this project.
+    // 
+    */
 
     [SerializeField] ConnectGameGrid _gameBoard;
     [SerializeField] Disk[] _playersDisks;
@@ -27,6 +41,8 @@ public class GameManager : AbstractManager
 
     int _turn = 0;
     IDisk _lastDiskPlaced = null;
+
+    #endregion
 
     public ConnectGameGrid GameBoard { get => _gameBoard; }
 
@@ -93,6 +109,7 @@ public class GameManager : AbstractManager
         }
         else
         {
+            //try again
             _players[_turn].EnableControls(true);
         }
     }
@@ -226,6 +243,22 @@ public class GameManager : AbstractManager
     private void OnPause()
     {
         _players[_turn].EnableControls(false);
+    }
+
+    //This functions are used only by the tests scripts
+    public void SetPlayerTokens(IDisk[] playerTokens )
+    {
+        _playersDisks = (Disk[])playerTokens;
+    }
+
+    public void SetBoard(IGrid grid)
+    {
+        _gameBoard = (ConnectGameGrid)grid;
+    }
+
+    public IDisk GetLastDiskPlaced()
+    {
+        return _lastDiskPlaced;
     }
 
 }

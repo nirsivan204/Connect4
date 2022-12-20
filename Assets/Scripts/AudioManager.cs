@@ -25,6 +25,8 @@ public class AudioManager : MonoBehaviour
     }
     public static AudioManager Instance { get; private set; }
 
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -62,7 +64,7 @@ public class AudioManager : MonoBehaviour
     private List<SoundSourceRef> SoundSourceRefList = new List<SoundSourceRef>();
 
 
-    public void PlaySound(SoundType soundType, bool isLoop = false)
+    public virtual void PlaySound(SoundType soundType, bool isLoop = false)
     {
         AudioClip clip = GetAudioClipByType(soundType);
 
