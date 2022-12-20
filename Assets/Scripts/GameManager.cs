@@ -24,19 +24,17 @@ public class GameManager : AbstractManager
     bool _isGameInProgress = false;
     bool _isTurnOngoing = false;
     /* 
-    // I decided to use the serializedField attribute with dragging in the inspector,
-    // instead of using references to assets in the resources folder. That is because all assets in the Resources folders will be included in a build.
-    // This means that every change of an asset will require:
-    //     1. updating the name and the reference to it.
-    //     2. deleting the old asset, so it will not be included in the build.
+    // I decided to use the serializedField attribute with dragging in the inspector for the board,
+    // instead of using reference to the asset in the Resources folder for simplicity.
     // 
-    // This class doesn't need many references so it is ok to use the dragging method.
+    // This class doesn't need many references so it is ok to use the dragging method,
     // The best way to do it will be using depenedency injection or asset bundles, but it is an overkill for this project.
     // 
     */
 
     [SerializeField] ConnectGameGrid _gameBoard;
-    [SerializeField] Disk[] _playersDisks;
+    
+    Disk[] _playersDisks;
     AbstractPlayer[] _players = new AbstractPlayer[NUM_OF_PLAYERS];
 
     int _turn = 0;
@@ -86,7 +84,9 @@ public class GameManager : AbstractManager
 
     protected override void ValidateParams()
     {
-        if(NUM_OF_PLAYERS < _playersDisks.Length)
+        SetPlayerTokens(new Disk[] { Resources.Load<Disk>(StringsConsts.DiskBName), Resources.Load<Disk>(StringsConsts.DiskAName) });
+
+        if (NUM_OF_PLAYERS < _playersDisks.Length)
         {
             throw new Exception("Some disks are not assigned to player");
         }
@@ -245,12 +245,13 @@ public class GameManager : AbstractManager
         _players[_turn].EnableControls(false);
     }
 
-    //This functions are used only by the tests scripts
-    public void SetPlayerTokens(IDisk[] playerTokens )
+    public void SetPlayerTokens(IDisk[] playerTokens)
     {
         _playersDisks = (Disk[])playerTokens;
     }
 
+
+    //This functions are used only by the tests scripts
     public void SetBoard(IGrid grid)
     {
         _gameBoard = (ConnectGameGrid)grid;

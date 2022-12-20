@@ -36,8 +36,8 @@ public class GameManagerTest
     {
         GameManagerMock GM = GameObject.Instantiate(new GameObject()).AddComponent<GameManagerMock>();
 
-        GM.SetBoard(GameObject.Instantiate(Resources.Load<GameObject>("Connect4Board")).GetComponentInChildren<ConnectGameGrid>());  //new GameObject().AddComponent<MockBoard>());
-        GM.SetPlayerTokens(new Disk[2] { Resources.Load<GameObject>("Disk_A").GetComponentInChildren<Disk>(), Resources.Load<GameObject>("Disk_B").GetComponentInChildren<Disk>() });
+        GM.SetBoard(GameObject.Instantiate(Resources.Load<GameObject>(StringsConsts.BoardName)).GetComponentInChildren<ConnectGameGrid>());  //new GameObject().AddComponent<MockBoard>());
+        GM.SetPlayerTokens(new Disk[2] { Resources.Load<GameObject>(StringsConsts.DiskAName).GetComponentInChildren<Disk>(), Resources.Load<GameObject>(StringsConsts.DiskBName).GetComponentInChildren<Disk>() });
 
         return GM;
     }

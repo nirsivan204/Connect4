@@ -1117,9 +1117,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameBoard: {fileID: 1412574989}
-  _playersDisks:
-  - {fileID: 640818935044631352, guid: 298ef72a6257245069ad0952492ef4dd, type: 3}
-  - {fileID: 3399353981605549623, guid: 45d4e2e49d2e049cab5a70277671aa16, type: 3}
 --- !u!1 &651330063 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7493245803969266439, guid: 01e310f11e3c545cea22bc42ee970205, type: 3}
