@@ -14,7 +14,9 @@ public enum SoundType
     // Music
     BG_Music,
 }
-
+/// <summary>
+/// This class manages all the music in game
+/// </summary>
 public class AudioManager : MonoBehaviour
 {
     public enum AudioSourceType
@@ -36,11 +38,16 @@ public class AudioManager : MonoBehaviour
         else
         {
             Instance = this;
+            //load player prefs
+            float musicVol, SFXVol;
+            GameData.LoadPlayerMusicPrefs(out musicVol, out SFXVol);
+            SetMusicVol(musicVol);
+            SetSFXVol(SFXVol);
             DontDestroyOnLoad(this);
         }
     }
 
-    
+    //#region PublicStructs
 
     [Serializable]
     public struct SoundRef

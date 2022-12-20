@@ -274,6 +274,8 @@ MonoBehaviour:
   _restartButton: {fileID: 297653850}
   _pauseManu: {fileID: 6724783329893247276}
   _settingsManu: {fileID: 261590160}
+  musicVolSlider: {fileID: 325450742}
+  sfxVolSlider: {fileID: 1411919932}
 --- !u!1 &40123895
 GameObject:
   m_ObjectHideFlags: 0

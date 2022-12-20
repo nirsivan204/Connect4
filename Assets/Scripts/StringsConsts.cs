@@ -14,5 +14,8 @@ public static class StringsConsts
     public const string BoardName =  "Connect4Board";
 
     #endregion
-
+    #region PlayerPrefsNames
+    public const string PPMusicVolName = "MusicVol";
+    public const string PPSFXVolName = "SFXVol";
+    #endregion
 }

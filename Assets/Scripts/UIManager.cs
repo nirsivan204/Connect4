@@ -18,6 +18,8 @@ public class UIManager : AbstractManager
     [SerializeField] GameObject _restartButton;
     [SerializeField] GameObject _pauseManu;
     [SerializeField] GameObject _settingsManu;
+    [SerializeField] Slider musicVolSlider;
+    [SerializeField] Slider sfxVolSlider;
     GameMode _modeChosen;
     #endregion
 
@@ -163,6 +165,10 @@ public class UIManager : AbstractManager
             case GameState.SETTINGS:
                 _mainManu.SetActive(false);
                 _settingsManu.SetActive(true);
+                float musicVol, SFXVol;
+                GameData.LoadPlayerMusicPrefs(out musicVol, out SFXVol);
+                musicVolSlider.value = musicVol;
+                sfxVolSlider.value = SFXVol;
                 break;
             default:
                 break;
@@ -190,6 +196,7 @@ public class UIManager : AbstractManager
             case GameState.RESTART:
                 break;
             case GameState.SETTINGS:
+                GameData.SavePlayerMusicPrefs(musicVolSlider.value, sfxVolSlider.value);
                 _settingsManu.SetActive(false);
                 break;
             default:
@@ -202,6 +209,7 @@ public class UIManager : AbstractManager
     public void OnMusicVolChange(float val)
     {
         AudioManager.Instance.SetMusicVol(val);
+
     }
 
     public void OnSFXVolChange(float val)
