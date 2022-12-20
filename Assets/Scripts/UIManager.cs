@@ -22,14 +22,14 @@ public class UIManager : AbstractManager
     #endregion
 
     #region ButtonHandlers
-    public void OnRestartButtonPress()
+    public void OnRestartButtonClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.RESTART);
         StateMachine.SetNextState(GameState.GAME);
     }
 
-    public void OnExitPausePress()
+    public void OnExitPauseClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.GAME);
@@ -51,7 +51,7 @@ public class UIManager : AbstractManager
         _modeChosen = GameMode.CVC;
     }
 
-    public void OnStartClicked()
+    public void OnStartClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         GameData.CurrentGameMode = _modeChosen;
@@ -79,20 +79,20 @@ public class UIManager : AbstractManager
         }
     }
 
-    public void OnMainManuClicked()
+    public void OnMainManuClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.RESTART);
         StateMachine.SetNextState(GameState.MANU);
     }
 
-    public void OnOpenSettings()
+    public void OnOpenSettingsClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.SETTINGS);
     }
 
-    public void OnCloseSettings()
+    public void OnCloseSettingsClick()
     {
         AudioManager.Instance.PlaySound(SoundType.Click);
         StateMachine.SetNextState(GameState.MANU);

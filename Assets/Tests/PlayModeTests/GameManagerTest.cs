@@ -54,7 +54,7 @@ public class GameManagerTest
     [UnityTest]
     //This test will check an example game, where player1 wins.
     //It checks turn switch, and basic game functionality
-    public IEnumerator GameManagerTestWithEnumeratorPasses()
+    public IEnumerator SimpleWinTest()
     {
         testObject = CreateGameManager();
         StateMachine.SetNextState(GameState.GAME);
@@ -74,7 +74,52 @@ public class GameManagerTest
         MakeMove(0);
         yield return new WaitUntil(IsStoppedFalling);
         Assert.AreEqual(GameState.GAME_ENDED, StateMachine.currentState);
+        DestroyGameRelatedObjects();
     }
+    [UnityTest]
+
+    public IEnumerator TurnSwitchTest()
+    {
+        testObject = CreateGameManager();
+        StateMachine.SetNextState(GameState.GAME);
+        yield return null;
+        Assert.AreEqual(testObject.GetTurn(), 0);
+        MakeMove(0);
+        yield return new WaitUntil(IsStoppedFalling);
+        Assert.AreEqual(testObject.GetTurn(), 1);
+        MakeMove(0);
+        yield return new WaitUntil(IsStoppedFalling);
+        Assert.AreEqual(testObject.GetTurn(), 0);
+        MakeMove(0);
+        yield return new WaitUntil(IsStoppedFalling);
+        Assert.AreEqual(testObject.GetTurn(), 1);
+        DestroyGameRelatedObjects();
+    }
+    [UnityTest]
+
+    public IEnumerator IlligalTurnTest()
+    {
+        testObject = CreateGameManager();
+        StateMachine.SetNextState(GameState.GAME);
+        yield return null;
+        //Illigal columns
+        Assert.Throws<Exception>(() => testObject.TryMakeMove(-1)); 
+        Assert.Throws<Exception>(() => testObject.TryMakeMove(GameManager.NUM_OF_COLS));
+
+
+        //check that the turn wasnt change if full col was chosen
+        for (int i = 0; i < GameManager.NUM_OF_ROWS; i++)
+        {
+            MakeMove(0);
+            yield return new WaitUntil(IsStoppedFalling);
+        }
+        int turnBeforeIlligalMove = testObject.GetTurn();
+        MakeMove(0);
+        Assert.AreEqual(turnBeforeIlligalMove,testObject.GetTurn());
+        DestroyGameRelatedObjects();
+
+    }
+
 
     private void MakeMove(int col)
     {
@@ -97,11 +142,16 @@ public class GameManagerTest
         return _isStoppedFalling;
     }
 
-    [TearDown]
-    public void TearDown()
+    private void DestroyGameRelatedObjects()
     {
         GameObject.Destroy(testObject.GameBoard);
         GameObject.Destroy(testObject);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        DestroyGameRelatedObjects();
         GameObject.Destroy(AudioManager.Instance);
     }
 }

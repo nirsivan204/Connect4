@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#region PublicEnums
 public enum GameState
 {
     MANU,
@@ -12,6 +13,8 @@ public enum GameState
     RESTART,
     SETTINGS,
 }
+
+#endregion
 /// <summary>
 ///       ----------------------
 ///       |                    |
@@ -28,19 +31,27 @@ public enum GameState
 
 public static class StateMachine
 {
-    // The current state of the state machine
-    public static GameState currentState = GameState.MANU;
-    public static event Action<GameState> StateExitEvent;
-    public static event Action<GameState> StateEnterEvent;
+    #region PrivateParams
     private static GameState? _stateInQueue = null;
     private static bool _isChangingState = false;
+    #endregion
 
+    #region PublicParams
+    // The current state of the state machine
+    public static GameState currentState = GameState.MANU;
 
+    #endregion
+
+    #region Events
+    public static event Action<GameState> StateExitEvent;
+    public static event Action<GameState> StateEnterEvent;
+    #endregion
+
+    #region StateMachineLogic
     /// <summary>
-    /// Change to a new state atomically. If more state changes are in queue, make them too.
-    /// 
-    ///
+    ///     Change to a new state atomically. If more state changes are in queue, make them too.
     /// </summary>
+    /// <param name="nextState">The next state</param>    
     private static void ChangeState(GameState nextState)
     {
         _isChangingState = true;
@@ -62,7 +73,9 @@ public static class StateMachine
         }
 
     }
+    #endregion
 
+    #region StateMachineAPI
     /// <summary>
     /// request a state change.
     /// 
@@ -76,7 +89,7 @@ public static class StateMachine
     /// 
     ///
     /// </summary>
-
+    /// <param name="nextState">The next state</param>    
     public static void SetNextState(GameState nextState)
     {
         //If during a state change
@@ -90,6 +103,9 @@ public static class StateMachine
         }
     }
 
+    #endregion
+
+    #region QueueHandlers
     private static bool GetNextStateFromQueue(out GameState? nextState)
     {
         nextState = null;
@@ -116,4 +132,5 @@ public static class StateMachine
         _stateInQueue = nextState;
         return;
     }
+    #endregion
 }

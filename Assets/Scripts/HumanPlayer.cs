@@ -6,12 +6,13 @@ public class HumanPlayer : AbstractPlayer
 {
     public HumanPlayer(GameManager gameMgr): base(gameMgr)
     {
+        //Subscribe to ColumnClicked event
         _gameMgr.GameBoard.ColumnClicked += MakeTurn;
     }
 
-    public override void OnDestroy()
+    ~HumanPlayer()
     {
-        base.OnDestroy();
+        //clean event listener when class instance is destroyed
         _gameMgr.GameBoard.ColumnClicked -= MakeTurn;
     }
 

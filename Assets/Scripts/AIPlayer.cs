@@ -11,10 +11,14 @@ public enum Difficult
 
 public class AIPlayer : AbstractPlayer
 {
-
+    //Delegate for functions of different strategies. Takes the current state of the board, and Returns the col of the next move chosen.
     delegate int CalculateNextMoveFunc(int[,] board = null);
     CalculateNextMoveFunc _nextMoveFunc;
-
+/// <summary>
+/// Builds an AI player and sets it's difficult.
+/// </summary>
+/// <param name="gameMgr"> The game manager</param>
+/// <param name="level"> The difficult level</param>
     public AIPlayer(GameManager gameMgr, Difficult level) : base(gameMgr)
     {
         switch (level)
@@ -51,11 +55,12 @@ public class AIPlayer : AbstractPlayer
 
     int Medium(int[,] board)
     {
+        //todo: random until going to Lose/Win in the next move
         throw new System.NotImplementedException();
 
     }
 
-    private int Hard(int[,] board)
+    int Hard(int[,] board)
     {
         //todo: min max algorithem
         throw new System.NotImplementedException();

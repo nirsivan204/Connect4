@@ -31,7 +31,7 @@ public class GameManager : AbstractManager
     // This class doesn't need many references so it is ok to use the dragging method.
 
     // The best way to do it will be using depenedency injection or asset bundles, but it is an overkill for this project.
-    // 
+    // (Same for the UIMgr)
     */
 
     [SerializeField] ConnectGameGrid _gameBoard;
@@ -49,17 +49,36 @@ public class GameManager : AbstractManager
     #endregion
 
     #region GettersSetters
+    /// <summary>
+    /// Returns the player index that plays the current turn
+    /// </summary>
+    /// <returns>Player index</returns>
+    public int GetTurn()
+    {
+        return _turn;
+    }
+
+    /// <summary>
+    /// Sets players' tokens prefabs
+    /// </summary>
+    /// <param name="playerTokens">array of Disk prefabs to set</param>
     public void SetPlayerTokens(IDisk[] playerTokens)
     {
         _playersDisks = (Disk[])playerTokens;
     }
 
-
+    /// <summary>
+    /// Sets the game board
+    /// </summary>
+    /// <param name="grid"></param>
     public void SetBoard(IGrid grid)
     {
         _gameBoard = (ConnectGameGrid)grid;
     }
-
+    /// <summary>
+    /// Returns the last disk placed
+    /// </summary>
+    /// <returns>Last disk placed</returns>
     public IDisk GetLastDiskPlaced()
     {
         return _lastDiskPlaced;
@@ -98,14 +117,17 @@ public class GameManager : AbstractManager
         _players[0].EnableControls(true);
         AudioManager.Instance.PlaySound(SoundType.GameStart);
     }
-
-
+    /// <summary>
+    /// Restarts the game
+    /// </summary>
     private void RestartGame()
     {
         _isGameInProgress = false;
         SceneManager.LoadScene(StringsConsts.GameSceneName);
     }
-
+    /// <summary>
+    /// Resumes the game
+    /// </summary>
     private void ResumeGame()
     {
         if (_isGameInProgress)
@@ -113,12 +135,16 @@ public class GameManager : AbstractManager
             _players[_turn].EnableControls(true);
         }
     }
-
+    /// <summary>
+    /// Pauses the game
+    /// </summary>
     private void PauseGame()
     {
         _players[_turn].EnableControls(false);
     }
-
+    /// <summary>
+    /// Finishes the game
+    /// </summary>
     private void FinishGame()
     {
         AudioManager.Instance.PlaySound(SoundType.Win);

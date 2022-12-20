@@ -36,16 +36,16 @@ public class BoardManagerTests
     { 1,1,1,2 } };
 
 
-        MakeABoardFromMatrix(4, 4, winTestBoardVertical);
+        MakeBoardFromMatrix(4, 4, winTestBoardVertical);
         Assert.AreEqual(GameResults.PLAYER1WIN, BoardManager.Result);
 
-        MakeABoardFromMatrix(4, 4, winTestBoardHorizontal);
+        MakeBoardFromMatrix(4, 4, winTestBoardHorizontal);
         Assert.AreEqual(GameResults.PLAYER1WIN, BoardManager.Result);
 
-        MakeABoardFromMatrix(4, 4, winTestBoardRightDiagonal);
+        MakeBoardFromMatrix(4, 4, winTestBoardRightDiagonal);
         Assert.AreEqual(GameResults.PLAYER2WIN, BoardManager.Result);
 
-        MakeABoardFromMatrix(4, 4, winTestBoardLeftDiagonal);
+        MakeBoardFromMatrix(4, 4, winTestBoardLeftDiagonal);
         Assert.AreEqual(GameResults.PLAYER2WIN, BoardManager.Result);
 
     }
@@ -66,10 +66,10 @@ public class BoardManagerTests
     { 1,1,1,2 } };
 
 
-        MakeABoardFromMatrix(4, 4, drawTestBoard1);
+        MakeBoardFromMatrix(4, 4, drawTestBoard1);
         Assert.AreEqual(GameResults.DRAW, BoardManager.Result);
 
-        MakeABoardFromMatrix(4, 4, drawTestBoard2);
+        MakeBoardFromMatrix(4, 4, drawTestBoard2);
         Assert.AreEqual(GameResults.DRAW, BoardManager.Result);
 
     }
@@ -80,27 +80,27 @@ public class BoardManagerTests
     public void BoardValidationCheck()
     {
         //no tokens check
-        MakeABoardUsingTurns(4, 5, new int[] { });
+        MakeBoardUsingTurns(4, 5, new int[] { });
         Assert.AreEqual(0, BoardManager.TokensPlaced);
 
         //validate count of tokens
-        MakeABoardUsingTurns(4, 5, new int[] { 0, 1, 2, 3, 4 });
+        MakeBoardUsingTurns(4, 5, new int[] { 0, 1, 2, 3, 4 });
         Assert.AreEqual(5,BoardManager.TokensPlaced);
-        MakeABoardUsingTurns(2, 2, new int[] { 0, 1, 0, 1});
+        MakeBoardUsingTurns(2, 2, new int[] { 0, 1, 0, 1});
         Assert.AreEqual(4, BoardManager.TokensPlaced);
 
         //validate put and get
-        MakeABoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
+        MakeBoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
         Assert.AreEqual(2, BoardManager.GetToken(3, 0));
         Assert.AreEqual(1, BoardManager.GetToken(2, 0));
 
         //validate isEmpty
-        MakeABoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
+        MakeBoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
         Assert.IsTrue(BoardManager.IsEmpty(1, 1));
         Assert.IsFalse(BoardManager.IsEmpty(2, 0));
 
         //validate assertion for illigal move
-        MakeABoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
+        MakeBoardUsingTurns(4, 5, new int[] { 0, 0, 0, 0 });
         Assert.Throws<Exception>(()=>BoardManager.PutToken(0,1));
 
         //validate assertion for illigal players move
@@ -111,7 +111,7 @@ public class BoardManagerTests
 
     }
 
-    private void MakeABoardUsingTurns(int rows, int cols, int[] turnsArray)
+    private void MakeBoardUsingTurns(int rows, int cols, int[] turnsArray)
     {
         BoardManager.InitBoard(rows, cols);
         for (int i = 0; i < turnsArray.Length; i++)
@@ -120,7 +120,7 @@ public class BoardManagerTests
         }
     }
 
-    private void MakeABoardFromMatrix(int rows, int cols, int[,] boardMatrix)
+    private void MakeBoardFromMatrix(int rows, int cols, int[,] boardMatrix)
     {
         if (boardMatrix.GetLength(0) != rows || boardMatrix.GetLength(1) != cols)
         {
