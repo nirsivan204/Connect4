@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#region PublicEnums
 public enum SoundType
 {
     //UI Sounds
@@ -14,20 +15,42 @@ public enum SoundType
     // Music
     BG_Music,
 }
+#endregion
 /// <summary>
 /// This class manages all the music in game
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
-    public enum AudioSourceType
+    #region PrivateEnums
+    [Serializable]
+    private enum AudioSourceType
     {
         UI,
         Gameplay,
         Music,
     }
+    #endregion
+
+    #region Structs
+
+    [Serializable]
+    struct SoundRef
+    {
+        public SoundType type;
+        public AudioClip clipRef;
+    }
+
+    [Serializable]
+    struct SoundSourceRef
+    {
+        public AudioSourceType SourceType;
+        public AudioSource AudioSourceRef;
+    }
+    #endregion
+
     public static AudioManager Instance { get; private set; }
 
-
+    #region ScriptLifeCycleFunctions
 
     private void Awake()
     {
@@ -47,21 +70,25 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    //#region PublicStructs
-
-    [Serializable]
-    public struct SoundRef
+    private void OnValidate()
     {
-        public SoundType type;
-        public AudioClip clipRef;
+        //todo - make the list automatically
+        for (int i = 0; i < SoundRefList.Count; i++)
+        {
+            if ((SoundType)i != SoundRefList[i].type)
+            {
+                throw new Exception("sound references needs to be same order as the enum order");
+            }
+        }
+        for (int i = 0; i < SoundSourceRefList.Count; i++)
+        {
+            if ((AudioSourceType)i != SoundSourceRefList[i].SourceType)
+            {
+                throw new Exception("sound source references needs to be same order as the enum order");
+            }
+        }
     }
-
-    [Serializable]
-    public struct SoundSourceRef
-    {
-        public AudioSourceType SourceType;
-        public AudioSource AudioSourceRef;
-    }
+    #endregion
 
 
     [SerializeField]
@@ -70,7 +97,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField]
     private List<SoundSourceRef> SoundSourceRefList = new List<SoundSourceRef>();
 
-
+    #region PublicMethods
     public virtual void PlaySound(SoundType soundType, bool isLoop = false)
     {
         AudioClip clip = GetAudioClipByType(soundType);
@@ -88,6 +115,18 @@ public class AudioManager : MonoBehaviour
 
     }
 
+    public void SetMusicVol(float val)
+    {
+        SoundSourceRefList[(int)AudioSourceType.Music].AudioSourceRef.volume = val;
+    }
+
+    public void SetSFXVol(float val)
+    {
+        SoundSourceRefList[(int)AudioSourceType.UI].AudioSourceRef.volume = val;
+        SoundSourceRefList[(int)AudioSourceType.Gameplay].AudioSourceRef.volume = val;
+    }
+    #endregion
+    #region PrivateMethods
     private void PlaySound(AudioClip clip, AudioSource source)
     {
         source.clip = clip;
@@ -121,35 +160,9 @@ public class AudioManager : MonoBehaviour
     {
         return SoundRefList[(int)soundType].clipRef;
     }
+    #endregion
 
-    private void OnValidate()
-    {
-        //todo - make the list automatically
-        for (int i = 0; i < SoundRefList.Count; i++)
-        {
-            if ((SoundType)i != SoundRefList[i].type)
-            {
-                throw new Exception("sound references needs to be same order as the enum order");
-            }
-        }
-        for (int i = 0; i < SoundSourceRefList.Count; i++)
-        {
-            if ((AudioSourceType)i != SoundSourceRefList[i].SourceType)
-            {
-                throw new Exception("sound source references needs to be same order as the enum order");
-            }
-        }
-    }
 
-    public void SetMusicVol(float val)
-    {
-        SoundSourceRefList[(int)AudioSourceType.Music].AudioSourceRef.volume = val;
-    }
 
-    public void SetSFXVol(float val)
-    {
-        SoundSourceRefList[(int)AudioSourceType.UI].AudioSourceRef.volume = val;
-        SoundSourceRefList[(int)AudioSourceType.Gameplay].AudioSourceRef.volume = val;
-    }
 }
 
