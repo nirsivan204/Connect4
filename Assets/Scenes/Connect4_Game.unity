@@ -1013,6 +1013,8 @@ MonoBehaviour:
   - type: 3
     clipRef: {fileID: 8300000, guid: 75a7daf6013f602438974429a9bac0ab, type: 3}
   - type: 4
+    clipRef: {fileID: 8300000, guid: 422e13ea0a433fd488baf1e253406ead, type: 3}
+  - type: 5
     clipRef: {fileID: 8300000, guid: 87ebd9fc3bc6b484da2e34e61aa0e40f, type: 3}
   SoundSourceRefList:
   - SourceType: 0

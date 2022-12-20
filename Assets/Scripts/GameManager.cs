@@ -147,7 +147,14 @@ public class GameManager : AbstractManager
     /// </summary>
     private void FinishGame()
     {
-        AudioManager.Instance.PlaySound(SoundType.Win);
+        if(GameData.CurrentGameResults == GameResults.DRAW)
+        {
+            AudioManager.Instance.PlaySound(SoundType.Draw);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySound(SoundType.Win);
+        }
     }
 
     #endregion

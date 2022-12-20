@@ -21,10 +21,19 @@ public class GameManagerTest
             return;
         }
 
+
     }
     private class AudioManagerMock: AudioManager
     {
         public override void PlaySound(SoundType soundType, bool isLoop = false)
+        {
+            return;
+        }
+        public override void SetSFXVol(float val)
+        {
+            return;
+        }
+        public override void SetMusicVol(float val)
         {
             return;
         }
@@ -34,6 +43,7 @@ public class GameManagerTest
 
     GameManager CreateGameManager()
     {
+        StateMachine.SetNextState(GameState.MANU);
         GameManagerMock GM = GameObject.Instantiate(new GameObject()).AddComponent<GameManagerMock>();
 
         GM.SetBoard(GameObject.Instantiate(Resources.Load<GameObject>(StringsConsts.BoardName)).GetComponentInChildren<ConnectGameGrid>());

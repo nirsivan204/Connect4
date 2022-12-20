@@ -12,6 +12,7 @@ public enum SoundType
     GameStart,
     DiskFall,
     Win,
+    Draw,
     // Music
     BG_Music,
 }
@@ -115,12 +116,12 @@ public class AudioManager : MonoBehaviour
 
     }
 
-    public void SetMusicVol(float val)
+    public virtual void SetMusicVol(float val)
     {
         SoundSourceRefList[(int)AudioSourceType.Music].AudioSourceRef.volume = val;
     }
 
-    public void SetSFXVol(float val)
+    public virtual void SetSFXVol(float val)
     {
         SoundSourceRefList[(int)AudioSourceType.UI].AudioSourceRef.volume = val;
         SoundSourceRefList[(int)AudioSourceType.Gameplay].AudioSourceRef.volume = val;
@@ -141,6 +142,7 @@ public class AudioManager : MonoBehaviour
             case SoundType.Click:
                 return GetAudioSourceByType(AudioSourceType.UI);
             case SoundType.Win:
+            case SoundType.Draw:
             case SoundType.DiskFall:
             case SoundType.GameStart:
                 return GetAudioSourceByType(AudioSourceType.Gameplay);
